@@ -7,6 +7,11 @@ This library output values in keypad data type defined in this library you can a
 
 */   
 
+// keypad function which returns key pressed when called.
+// port must be given as input with &before it eg: &PORTD
+// returns rows and columns in keypad data form defined before.
+// in case of fail reading or key is not pressed returns rows and columns as 15
+
 //if delay lib was not included
 #ifndef F_CPU
 #warinig "util/delay.h not included or included after this library"
@@ -21,18 +26,15 @@ typedef struct {
 	uint8_t row : 2;
 	uint8_t column :2;
 	} keypad;
-// keypad function which returns key pressed when called.
-// port must be given as input with &before it eg: &PORTD
-// returns rows and colums in keypad data form defined before.
-// incase of fail reading or key is not pressed returns rows and colums as 15 
-keypad keypad_getkey(volatile uint8_t *Port)
+
+keypad keypad_getkey(volatile uint8_t *port)
 {
 	uint8_t i=0;
 	keypad key;
 	key.row=4;                         //
-	key.column=4;                      //initilize column and row to 4 value which indicates error.
-	*(port-1) =0xF0;                   //set colums as output and rows as input.
-	*(port) =0x0F;                     //set colums low and rows with pull_up resistors
+	key.column=4;                      //initialize column and row to 4 value which indicates error.
+	*(port-1) =0xF0;                   //set columns as output and rows as input.
+	*(port) =0x0F;                     //set columns low and rows with pull_up resistors
 	_delay_ms(keypad_excdelay);        //wait for settings to take effect
 	i=*(port-2)^0x0F;                  //reads row number.
 	if(i==0)
